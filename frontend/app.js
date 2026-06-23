@@ -4,6 +4,7 @@
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 const ANNUAL_MEAN_LOAD = 71222.89; // kW from EDA statistical summary
+let latestWeather = null; // Stores fetched live weather data
 
 document.addEventListener("DOMContentLoaded", () => {
     initSliders();
@@ -11,6 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
     initPresets();
     checkApiStatus();
     initFormSubmit();
+    
+    // Fetch external integrated feeds
+    loadWeatherFeed();
+    loadHolidaysFeed();
     
     // Check API status periodically (every 5 seconds)
     setInterval(checkApiStatus, 5000);
@@ -342,4 +347,126 @@ function animateValue(obj, start, end, duration) {
 
 function formatNum(num) {
     return Math.round(num).toLocaleString();
+}
+
+/* 8. Live Weather Feed (Dhanbad) */
+async function loadWeatherFeed() {
+    const loader = document.getElementById("weather-loader");
+    const content = document.getElementById("weather-content");
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/weather`);
+        if (!response.ok) throw new Error("Failed to fetch weather");
+        
+        const data = await response.json();
+        latestWeather = data.current;
+        
+        // Populate UI elements
+        document.getElementById("feed-temp").textContent = `${latestWeather.Temperature.toFixed(1)} °C`;
+        document.getElementById("feed-condition").textContent = latestWeather.condition;
+        document.getElementById("feed-humidity").textContent = `${latestWeather.Humidity}%`;
+        document.getElementById("feed-wind").textContent = `${latestWeather.WindSpeed} m/s`;
+        
+        // Swap visibility
+        loader.classList.add("hidden");
+        content.classList.remove("hidden");
+        
+        // Register button listener
+        document.getElementById("apply-weather-btn").addEventListener("click", applyWeatherToSliders);
+        
+    } catch (error) {
+        console.error("Failed to load weather feed:", error);
+        loader.innerHTML = `
+            <i class="fa-solid fa-cloud-bolt" style="color: var(--danger); font-size: 1.2rem;"></i>
+            <span style="margin-top: 0.5rem; display: block;">Feed Offline</span>
+        `;
+    }
+}
+
+function applyWeatherToSliders() {
+    if (!latestWeather) return;
+    
+    // Set Sliders
+    const tempSlider = document.getElementById("temperature");
+    const humSlider = document.getElementById("humidity");
+    const windSlider = document.getElementById("windspeed");
+    
+    tempSlider.value = latestWeather.Temperature;
+    document.getElementById("temp-val").textContent = `${latestWeather.Temperature.toFixed(1)} °C`;
+    triggerHighlight(tempSlider.parentElement);
+    
+    humSlider.value = latestWeather.Humidity;
+    document.getElementById("humidity-val").textContent = `${latestWeather.Humidity.toFixed(1)} %`;
+    triggerHighlight(humSlider.parentElement);
+    
+    windSlider.value = latestWeather.WindSpeed;
+    document.getElementById("windspeed-val").textContent = `${latestWeather.WindSpeed.toFixed(1)} m/s`;
+    triggerHighlight(windSlider.parentElement);
+}
+
+/* 9. Grid Holidays Feed */
+async function loadHolidaysFeed() {
+    const loader = document.getElementById("holidays-loader");
+    const listContainer = document.getElementById("holidays-list");
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/holidays`);
+        if (!response.ok) throw new Error("Failed to fetch holidays");
+        
+        const data = await response.json();
+        
+        // Clear loader and existing items
+        listContainer.innerHTML = "";
+        
+        data.holidays.forEach(holiday => {
+            const item = document.createElement("div");
+            item.className = "holiday-item";
+            item.setAttribute("data-date", holiday.Date);
+            
+            const formattedDate = formatHolidayDate(holiday.Date);
+            
+            item.innerHTML = `
+                <span class="holiday-name" title="${holiday.Holiday}">${holiday.Holiday}</span>
+                <span class="holiday-date">${formattedDate}</span>
+            `;
+            
+            // Click handler to load this date into the datetime picker
+            item.addEventListener("click", () => {
+                const picker = document.getElementById("datetime-picker");
+                // Set to 12:00 PM (noon) on that holiday date
+                picker.value = `${holiday.Date}T12:00`;
+                // Manually trigger change event
+                picker.dispatchEvent(new Event("change"));
+                
+                // Temporary visual feedback
+                item.style.transform = "scale(0.96)";
+                setTimeout(() => { item.style.transform = ""; }, 100);
+            });
+            
+            listContainer.appendChild(item);
+        });
+        
+        // Swap visibility
+        loader.classList.add("hidden");
+        listContainer.classList.remove("hidden");
+        
+    } catch (error) {
+        console.error("Failed to load holidays feed:", error);
+        loader.innerHTML = `
+            <i class="fa-solid fa-calendar-xmark" style="color: var(--danger); font-size: 1.2rem;"></i>
+            <span style="margin-top: 0.5rem; display: block;">Feed Offline</span>
+        `;
+    }
+}
+
+function formatHolidayDate(dateStr) {
+    // Input: YYYY-MM-DD
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return dateStr;
+    
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const day = parseInt(parts[2]);
+    const monthIndex = parseInt(parts[1]) - 1;
+    
+    return `${day} ${months[monthIndex]}`;
 }

@@ -123,6 +123,60 @@ def read_root():
     }
 
 
+@app.get("/weather")
+def get_weather():
+    """
+    Returns sample meteorological forecast data for Dhanbad, Jharkhand, India.
+    This simulates integration with an external live weather API.
+    """
+    return {
+        "location": "Dhanbad, Jharkhand, India",
+        "station": "Dhanbad Meteorological Observatory",
+        "current": {
+            "Temperature": 28.5,
+            "Humidity": 70.0,
+            "WindSpeed": 2.5,
+            "condition": "Scattered Clouds"
+        },
+        "forecast_today": [
+            {"hour": 8, "Temperature": 24.2, "Humidity": 85.0, "WindSpeed": 1.8, "condition": "Mist"},
+            {"hour": 12, "Temperature": 30.5, "Humidity": 65.0, "WindSpeed": 2.2, "condition": "Partly Cloudy"},
+            {"hour": 16, "Temperature": 31.8, "Humidity": 60.0, "WindSpeed": 2.8, "condition": "Scattered Clouds"},
+            {"hour": 20, "Temperature": 27.0, "Humidity": 75.0, "WindSpeed": 1.5, "condition": "Clear"},
+            {"hour": 0, "Temperature": 23.5, "Humidity": 88.0, "WindSpeed": 1.0, "condition": "Clear"}
+        ]
+    }
+
+
+@app.get("/holidays")
+def get_holidays():
+    """
+    Reads the data/holidays.csv file and returns all official holiday records.
+    """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    holidays_path = os.path.join(base_dir, "..", "data", "holidays.csv")
+    
+    if not os.path.exists(holidays_path):
+        raise HTTPException(
+            status_code=404, 
+            detail=f"Holidays database file not found at expected path: {holidays_path}"
+        )
+    try:
+        df_holidays = pd.read_csv(holidays_path)
+        # Parse Dates as strings to ensure robust JSON serialization
+        df_holidays["Date"] = df_holidays["Date"].astype(str)
+        holidays_list = df_holidays.to_dict(orient="records")
+        return {
+            "total_holidays": len(holidays_list),
+            "holidays": holidays_list
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to read holiday database: {str(e)}"
+        )
+
+
 @app.post("/predict", response_model=PredictionResponse)
 def predict(request: PredictionRequest):
     """

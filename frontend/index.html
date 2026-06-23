@@ -163,72 +163,119 @@
                 </form>
             </section>
 
-            <!-- Right Side: Results & Visualizations -->
-            <section class="card result-card">
-                <div class="card-header">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <h2>Forecasting Output</h2>
-                </div>
-
-                <div class="result-display-wrapper">
-                    <!-- Default state / Initial instruction -->
-                    <div id="result-placeholder" class="result-placeholder">
-                        <div class="pulse-ring">
-                            <i class="fa-solid fa-bolt placeholder-bolt"></i>
-                        </div>
-                        <h3>Awaiting Input Parameters</h3>
-                        <p>Configure the sliders or select a preset scenario, then click <strong>"Generate Power Forecast"</strong> to run the machine learning model.</p>
+            <!-- Right Side: Results & Real-time Feeds -->
+            <div class="right-column-container">
+                <!-- Card 1: Results -->
+                <section class="card result-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <h2>Forecasting Output</h2>
                     </div>
 
-                    <!-- Loading Spinner -->
-                    <div id="result-loading" class="result-loading hidden">
-                        <div class="loader-ring">
-                            <div class="loader-core"></div>
-                        </div>
-                        <h3>Analyzing Weather Patterns...</h3>
-                        <p>Running Random Forest Regressor inference...</p>
-                    </div>
-
-                    <!-- Successful Prediction Output -->
-                    <div id="result-content" class="result-content hidden">
-                        <div class="prediction-glow-card">
-                            <span class="output-title">FORECASTED GRID POWER DEMAND</span>
-                            <div class="output-value-container">
-                                <span id="prediction-value" class="output-value">--</span>
-                                <span class="output-unit">kW</span>
+                    <div class="result-display-wrapper">
+                        <!-- Default state / Initial instruction -->
+                        <div id="result-placeholder" class="result-placeholder">
+                            <div class="pulse-ring">
+                                <i class="fa-solid fa-bolt placeholder-bolt"></i>
                             </div>
-                            <div id="demand-badge" class="demand-badge">
-                                <span id="demand-badge-text">Optimal Load</span>
+                            <h3>Awaiting Input Parameters</h3>
+                            <p>Configure the sliders or select a preset scenario, then click <strong>"Generate Power Forecast"</strong> to run the machine learning model.</p>
+                        </div>
+
+                        <!-- Loading Spinner -->
+                        <div id="result-loading" class="result-loading hidden">
+                            <div class="loader-ring">
+                                <div class="loader-core"></div>
+                            </div>
+                            <h3>Analyzing Weather Patterns...</h3>
+                            <p>Running Random Forest Regressor inference...</p>
+                        </div>
+
+                        <!-- Successful Prediction Output -->
+                        <div id="result-content" class="result-content hidden">
+                            <div class="prediction-glow-card">
+                                <span class="output-title">FORECASTED GRID POWER DEMAND</span>
+                                <div class="output-value-container">
+                                    <span id="prediction-value" class="output-value">--</span>
+                                    <span class="output-unit">kW</span>
+                                </div>
+                                <div id="demand-badge" class="demand-badge">
+                                    <span id="demand-badge-text">Optimal Load</span>
+                                </div>
+                            </div>
+
+                            <!-- Mini Analysis Card -->
+                            <div class="analysis-card">
+                                <h4><i class="fa-solid fa-magnifying-glass-chart"></i> Quick Grid Analytics</h4>
+                                <ul class="analytics-list">
+                                    <li>
+                                        <span class="analytic-label">Relative to Annual Mean:</span>
+                                        <span id="analytic-vs-mean" class="analytic-value">--</span>
+                                    </li>
+                                    <li>
+                                        <span class="analytic-label">Grid Risk Level:</span>
+                                        <span id="analytic-risk" class="analytic-value">--</span>
+                                    </li>
+                                    <li>
+                                        <span class="analytic-label">Estimated Feeder Load (F1-F3):</span>
+                                        <span id="analytic-feeders" class="analytic-value">--</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Technical Details -->
+                            <div class="tech-footnote">
+                                <i class="fa-solid fa-circle-info"></i>
+                                Forecast generated using a Random Forest Regressor (MAE: ~1288.79 kW, Relative Error: ~1.8%).
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Card 2: Real-time Data Feeds -->
+                <section class="card feeds-card">
+                    <div class="card-header">
+                        <i class="fa-solid fa-satellite-dish"></i>
+                        <h2>Data Feeds & Integrations</h2>
+                    </div>
+                    <div class="feeds-container">
+                        <!-- Weather Feed -->
+                        <div class="feed-block weather-feed">
+                            <h3><i class="fa-solid fa-cloud-sun"></i> Dhanbad Live Weather</h3>
+                            <div id="weather-loader" class="feed-loader">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Fetching weather...
+                            </div>
+                            <div id="weather-content" class="feed-content hidden">
+                                <div class="weather-brief">
+                                    <span class="weather-temp" id="feed-temp">-- °C</span>
+                                    <div class="weather-details">
+                                        <span id="feed-condition" class="weather-cond">--</span>
+                                        <span class="location-sub">Dhanbad, JH</span>
+                                    </div>
+                                </div>
+                                <div class="weather-stats">
+                                    <span><i class="fa-solid fa-droplet"></i> Hum: <strong id="feed-humidity">--%</strong></span>
+                                    <span><i class="fa-solid fa-wind"></i> Wind: <strong id="feed-wind">-- m/s</strong></span>
+                                </div>
+                                <button type="button" id="apply-weather-btn" class="btn btn-secondary btn-xs">
+                                    <i class="fa-solid fa-cloud-download"></i> Apply to Sliders
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Mini Analysis Card -->
-                        <div class="analysis-card">
-                            <h4><i class="fa-solid fa-magnifying-glass-chart"></i> Quick Grid Analytics</h4>
-                            <ul class="analytics-list">
-                                <li>
-                                    <span class="analytic-label">Relative to Annual Mean:</span>
-                                    <span id="analytic-vs-mean" class="analytic-value">--</span>
-                                </li>
-                                <li>
-                                    <span class="analytic-label">Grid Risk Level:</span>
-                                    <span id="analytic-risk" class="analytic-value">--</span>
-                                </li>
-                                <li>
-                                    <span class="analytic-label">Estimated Feeder Load (F1-F3):</span>
-                                    <span id="analytic-feeders" class="analytic-value">--</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- Technical Details -->
-                        <div class="tech-footnote">
-                            <i class="fa-solid fa-circle-info"></i>
-                            Forecast generated using a Random Forest Regressor (MAE: ~1288.79 kW, Relative Error: ~1.8%).
+                        <!-- Holidays Feed -->
+                        <div class="feed-block holidays-feed">
+                            <h3><i class="fa-solid fa-calendar-days"></i> 2017 Grid Holidays</h3>
+                            <div id="holidays-loader" class="feed-loader">
+                                <i class="fa-solid fa-spinner fa-spin"></i> Loading database...
+                            </div>
+                            <div id="holidays-list" class="holidays-scroll-list hidden">
+                                <!-- Dynamically populated -->
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
 
         <!-- Footer -->
