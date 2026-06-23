@@ -1,0 +1,18 @@
+# Core Data Science & ML Dependencies (used in EDA_Modeling.ipynb)
+pandas>=2.0.0
+numpy>=1.24.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+scikit-learn>=1.2.0
+joblib>=1.3.0
+
+# Jupyter Notebook Environment (optional, for running the notebook)
+ipykernel
+jupyter
+
+# Future Deployment & API Dependencies (recommended for completing the app)
+# fastapi>=0.100.0
+# uvicorn>=0.22.0
+# pydantic>=2.0
+# httpx>=0.24.0
+# streamlit>=1.25.0
