@@ -2,6 +2,7 @@ import os
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # Initialize FastAPI application
@@ -12,6 +13,15 @@ app = FastAPI(
         "to forecast electricity demand based on meteorological and temporal parameters."
     ),
     version="1.0.0",
+)
+
+# Enable CORS (Cross-Origin Resource Sharing) to allow frontend connections
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for local development/testing
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 # Determine the absolute path to the model.pkl file

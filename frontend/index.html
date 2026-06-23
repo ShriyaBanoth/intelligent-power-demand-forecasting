@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GridVision AI - Intelligent Power Demand Forecasting</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Navbar -->
+        <header class="navbar">
+            <div class="brand">
+                <i class="fa-solid fa-bolt brand-icon"></i>
+                <div class="brand-text">
+                    <h1>GRIDVISION AI</h1>
+                    <p>Intelligent Power Demand Forecasting</p>
+                </div>
+            </div>
+            <div class="api-status-container">
+                <span class="status-label">API Service:</span>
+                <div id="api-status" class="status-indicator checking">
+                    <span class="indicator-dot"></span>
+                    <span class="indicator-text">Checking connection...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Presets Bar -->
+        <section class="presets-section">
+            <div class="section-title-compact">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Quick Scenario Presets:
+            </div>
+            <div class="presets-grid">
+                <button class="preset-btn" data-preset="summer-peak">
+                    <span class="preset-icon">🔥</span> Summer Peak Afternoon
+                </button>
+                <button class="preset-btn" data-preset="winter-night">
+                    <span class="preset-icon">❄️</span> Winter Night Peak
+                </button>
+                <button class="preset-btn" data-preset="monsoon-weekday">
+                    <span class="preset-icon">🌧️</span> Monsoon Weekday
+                </button>
+                <button class="preset-btn" data-preset="spring-weekend">
+                    <span class="preset-icon">🌤️</span> Spring Weekend Morning
+                </button>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-grid">
+            <!-- Left Side: Inputs Form -->
+            <section class="card form-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-sliders"></i>
+                    <h2>Forecast Parameters</h2>
+                </div>
+                
+                <form id="prediction-form" onsubmit="event.preventDefault();">
+                    <!-- 1. Date-Time Smart Extractor -->
+                    <div class="form-group smart-date-group">
+                        <label for="datetime-picker">
+                            <i class="fa-regular fa-calendar-days"></i> Select Date & Time (Smart Extractor)
+                        </label>
+                        <div class="datetime-input-wrapper">
+                            <input type="datetime-local" id="datetime-picker" required>
+                            <span class="helper-text">Extracts temporal features automatically on change</span>
+                        </div>
+                    </div>
+
+                    <div class="divider"><span>OR CUSTOMIZE INDIVIDUALLY</span></div>
+
+                    <!-- 2. Meteorological Variables -->
+                    <div class="input-section-title">Meteorological Factors</div>
+                    
+                    <div class="form-group range-group">
+                        <div class="range-label-wrapper">
+                            <label for="temperature"><i class="fa-solid fa-thermometer-half"></i> Temperature</label>
+                            <span class="range-val" id="temp-val">25.0 °C</span>
+                        </div>
+                        <input type="range" id="temperature" min="0" max="50" step="0.1" value="25.0" class="slider">
+                    </div>
+
+                    <div class="form-group range-group">
+                        <div class="range-label-wrapper">
+                            <label for="humidity"><i class="fa-solid fa-droplet"></i> Humidity</label>
+                            <span class="range-val" id="humidity-val">60 %</span>
+                        </div>
+                        <input type="range" id="humidity" min="0" max="100" step="0.5" value="60.0" class="slider">
+                    </div>
+
+                    <div class="form-group range-group">
+                        <div class="range-label-wrapper">
+                            <label for="windspeed"><i class="fa-solid fa-wind"></i> Wind Speed</label>
+                            <span class="range-val" id="windspeed-val">2.0 m/s</span>
+                        </div>
+                        <input type="range" id="windspeed" min="0" max="15" step="0.1" value="2.0" class="slider">
+                    </div>
+
+                    <!-- 3. Temporal Variables (Manually Adjustable) -->
+                    <div class="input-section-title">Temporal Factors</div>
+                    
+                    <div class="temporal-grid">
+                        <div class="form-group">
+                            <label for="hour">Hour (0-23)</label>
+                            <input type="number" id="hour" min="0" max="23" value="12" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="day">Day (1-31)</label>
+                            <input type="number" id="day" min="1" max="31" value="15" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="month">Month</label>
+                            <select id="month" required>
+                                <option value="1">January (1)</option>
+                                <option value="2">February (2)</option>
+                                <option value="3">March (3)</option>
+                                <option value="4">April (4)</option>
+                                <option value="5">May (5)</option>
+                                <option value="6" selected>June (6)</option>
+                                <option value="7">July (7)</option>
+                                <option value="8">August (8)</option>
+                                <option value="9">September (9)</option>
+                                <option value="10">October (10)</option>
+                                <option value="11">November (11)</option>
+                                <option value="12">December (12)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="weekday">Weekday</label>
+                            <select id="weekday" required>
+                                <option value="0">Monday</option>
+                                <option value="1">Tuesday</option>
+                                <option value="2" selected>Wednesday</option>
+                                <option value="3">Thursday</option>
+                                <option value="4">Friday</option>
+                                <option value="5">Saturday</option>
+                                <option value="6">Sunday</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group weekend-toggle-group">
+                        <label for="weekend" class="toggle-label">
+                            <span>Is it a Weekend?</span>
+                            <span class="helper-text-inline">Automatically sets to Yes for Sat/Sun</span>
+                        </label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="weekend">
+                            <label for="weekend" class="toggle-slider"></label>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="predict-btn" class="btn btn-primary">
+                        <i class="fa-solid fa-calculator"></i> Generate Power Forecast
+                    </button>
+                </form>
+            </section>
+
+            <!-- Right Side: Results & Visualizations -->
+            <section class="card result-card">
+                <div class="card-header">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h2>Forecasting Output</h2>
+                </div>
+
+                <div class="result-display-wrapper">
+                    <!-- Default state / Initial instruction -->
+                    <div id="result-placeholder" class="result-placeholder">
+                        <div class="pulse-ring">
+                            <i class="fa-solid fa-bolt placeholder-bolt"></i>
+                        </div>
+                        <h3>Awaiting Input Parameters</h3>
+                        <p>Configure the sliders or select a preset scenario, then click <strong>"Generate Power Forecast"</strong> to run the machine learning model.</p>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div id="result-loading" class="result-loading hidden">
+                        <div class="loader-ring">
+                            <div class="loader-core"></div>
+                        </div>
+                        <h3>Analyzing Weather Patterns...</h3>
+                        <p>Running Random Forest Regressor inference...</p>
+                    </div>
+
+                    <!-- Successful Prediction Output -->
+                    <div id="result-content" class="result-content hidden">
+                        <div class="prediction-glow-card">
+                            <span class="output-title">FORECASTED GRID POWER DEMAND</span>
+                            <div class="output-value-container">
+                                <span id="prediction-value" class="output-value">--</span>
+                                <span class="output-unit">kW</span>
+                            </div>
+                            <div id="demand-badge" class="demand-badge">
+                                <span id="demand-badge-text">Optimal Load</span>
+                            </div>
+                        </div>
+
+                        <!-- Mini Analysis Card -->
+                        <div class="analysis-card">
+                            <h4><i class="fa-solid fa-magnifying-glass-chart"></i> Quick Grid Analytics</h4>
+                            <ul class="analytics-list">
+                                <li>
+                                    <span class="analytic-label">Relative to Annual Mean:</span>
+                                    <span id="analytic-vs-mean" class="analytic-value">--</span>
+                                </li>
+                                <li>
+                                    <span class="analytic-label">Grid Risk Level:</span>
+                                    <span id="analytic-risk" class="analytic-value">--</span>
+                                </li>
+                                <li>
+                                    <span class="analytic-label">Estimated Feeder Load (F1-F3):</span>
+                                    <span id="analytic-feeders" class="analytic-value">--</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Technical Details -->
+                        <div class="tech-footnote">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Forecast generated using a Random Forest Regressor (MAE: ~1288.79 kW, Relative Error: ~1.8%).
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2026 GridVision AI. Intelligent Utility Grid Forecasting Systems. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Script File -->
+    <script src="app.js"></script>
+</body>
+</html>
